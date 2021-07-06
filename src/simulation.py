@@ -60,3 +60,52 @@ class InvalidSimulationStepException(Exception):
 class CannotAddSimulationStepException(Exception):
     def __init__(self, simulation_step: SimulationStep):
         super().__init__("Simulation is full. Cannot add {}.".format(str(simulation_step)))
+
+class to_json:
+    def __init__(self, path: str):
+        self.path = path
+
+    def to_json(self) -> None:
+        with open(self.path) as f:
+            data = json.load(f)
+            f.close()
+
+        topography = data['topography']
+        targets = data['targets']
+        sources = data['sources']
+        obstacles = data['obstacles']
+        pedestrians = data['pedestrians']
+        n_steps = data['simulation']['end'] - data['simulation']['start']
+        simulation_steps = data['simulation_steps']
+
+        for simulation_step in simulation_steps:
+            print(simulation_step)
+            if not self._is_valid_simulation_step(simulation_step, pedestrians, topography):
+                raise InvalidSimulationStepException(simulation_step)
+
+        return Simulation(topography, pedestrians, n_steps, simulation_steps)
+
+    def _is_valid_simulation_step(self, simulation_step: SimulationStep, pedestrians: Pedestrian, topography: Topography) -> bool:
+        """
+        A simulation step is valid if there are coordinates for every defined pedestrian
+        and the coordinates lie within the defined topography
+        """
+        flag1 = True
+        flag2 = True
+        for pedestrian in pedestrians:
+            if pedestrian not in simulation_step['pedestrians']:
+                flag1 = False
+                break
+            if not self._is_valid_position(simulation_step['pedestrians'][pedestrian], topography):
+                flag2 = False
+                break
+
+        return flag1 and flag2
+        #return (
+         #   all([pedestrian in simulation_step for pedestrian in pedestrians]) and
+          #  all([self._is_valid_position(simulation_step[pedestrian], topography)
+           #     for pedestrian in pedestrians])
+        #)
+
+    def _is_valid_position(self, position: list, topography: Topography):
+        return 0 <= position[0] < topography['width'] and 0 <= position[1] < topography['height']
