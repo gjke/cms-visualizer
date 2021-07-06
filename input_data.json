@@ -1,0 +1,70 @@
+{
+  "topography": {
+    "width": 100,
+    "height": 100
+  },
+  "targets": [
+    {
+      "type": "RECTANGLE",
+      "shape": {
+        "x": 5,
+        "y": 5,
+        "width": 20,
+        "height": 20
+      }
+    }
+  ],
+  "obstacles": [
+    {
+      "type": "RECTANGLE",
+      "shape": {
+        "x": 5,
+        "y": 5,
+        "width": 20,
+        "height": 20
+      }
+    }
+  ],
+  "sources": [
+    {
+      "type": "RECTANGLE",
+      "shape": {
+        "x": 4,
+        "y": 4,
+        "width": 1,
+        "height": 1
+      }
+    }
+  ],
+  "pedestrians": ["p1", "p2", "p3"],
+  "simulation": {
+    "start": 0,
+    "end": 100
+  },
+  "simulation_steps": [
+    {
+      "step": 0,
+      "pedestrians": {
+        "p1": [3,300],
+        "p2": [1,1],
+        "p3": [2,2]
+      }
+    },
+    {
+      "step": 1,
+      "pedestrians": {
+        "p1": [0,0],
+        "p2": [1,1],
+        "p3": [2,2]
+      }
+    },
+    {
+      "step": 2,
+      "pedestrians": {
+        "p1": [0,0],
+        "p2": [1,1],
+        "p3": [2,2]
+      }
+    }
+  ]
+}
