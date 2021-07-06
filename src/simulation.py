@@ -25,6 +25,26 @@ class Simulation:
         self.pedestrians = pedestrians
         self.n_steps = n_steps
         self.simulation_steps = simulation_steps
+        
+    def from_json(self) -> None:
+        with open(self.path) as f:
+            data = json.load(f)
+            f.close()
+
+        self.topography = data['topography']
+        targets = data['targets']
+        sources = data['sources']
+        obstacles = data['obstacles']
+        self.pedestrians = data['pedestrians']
+        self.n_steps = data['simulation']['end'] - data['simulation']['start']
+        self.simulation_steps = data['simulation_steps']
+
+        for simulation_step in self.simulation_steps:
+            print(simulation_step)
+            if not self._is_valid_simulation_step(simulation_step, self.pedestrians, self.topography):
+                raise InvalidSimulationStepException(simulation_step)
+
+        #return Simulation(topography, pedestrians, n_steps, simulation_steps)
 
     def _is_valid_simulation_step(self, simulation_step: SimulationStep) -> bool:
         '''
@@ -61,11 +81,11 @@ class CannotAddSimulationStepException(Exception):
     def __init__(self, simulation_step: SimulationStep):
         super().__init__("Simulation is full. Cannot add {}.".format(str(simulation_step)))
 
-class to_json:
+class from_json:
     def __init__(self, path: str):
         self.path = path
 
-    def to_json(self) -> None:
+    def from_json(self) -> None:
         with open(self.path) as f:
             data = json.load(f)
             f.close()
