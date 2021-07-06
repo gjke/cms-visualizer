@@ -48,24 +48,24 @@ class Visualizer:
             self.canvas.fill_rects(
                 x=[p.x * self.cell_width for p in self.simulation.topography.obstacles],
                 y=[p.y * self.cell_height for p in self.simulation.topography.obstacles],
-                width=self.cell_width - 1,
-                height=self.cell_height - 1
+                width=[p.width * self.cell_width for p in self.simulation.topography.obstacles],
+                height=[p.height * self.cell_height for p in self.simulation.topography.obstacles]
             )
             # draw target
             self.canvas.fill_style = 'green'
             self.canvas.fill_rects(
                 x=[p.x * self.cell_width for p in self.simulation.topography.targets],
                 y=[p.y * self.cell_height for p in self.simulation.topography.targets],
-                width=self.cell_width - 1,
-                height=self.cell_height - 1
+                width=[p.width * self.cell_width for p in self.simulation.topography.targets],
+                height=[p.height * self.cell_height for p in self.simulation.topography.targets]
             )
             # draw sources
             self.canvas.fill_style = 'blue'
             self.canvas.fill_rects(
                 x=[p.x * self.cell_width for p in self.simulation.topography.sources],
                 y=[p.y * self.cell_height for p in self.simulation.topography.sources],
-                width=self.cell_width - 1,
-                height=self.cell_height - 1
+                width=[p.width * self.cell_width for p in self.simulation.topography.sources],
+                height=[p.height * self.cell_height for p in self.simulation.topography.sources]
             )
         display(self.canvas)
 
