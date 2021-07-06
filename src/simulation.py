@@ -2,6 +2,7 @@ from __future__ import annotations
 from typing import Optional, List, Text, Dict
 from dataclasses import dataclass
 from .topography import Topography
+import json
 
 
 @dataclass
@@ -20,14 +21,42 @@ SimulationStep = Dict[int, Position]
 
 
 class Simulation:
-    def __init__(self, topography: Topography, pedestrians: List[Pedestrian], n_steps: int, simulation_steps: List[SimulationStep]) -> None:
-        self.topography = topography
-        self.pedestrians = pedestrians
-        self.n_steps = n_steps
-        self.simulation_steps = simulation_steps
-        
-    def from_json(self, path: str) -> None:
-        with open(path) as f:
+    # def __init__(self, topography: Topography, pedestrians: List[Pedestrian], n_steps: int, simulation_steps: List[SimulationStep]) -> None:
+    #     self.topography = topography
+    #     self.pedestrians = pedestrians
+    #     self.n_steps = n_steps
+    #     self.simulation_steps = simulation_steps
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+        self.topography = Topography
+        self.pedestrians = List[Pedestrian]
+        self.n_steps = int
+        self.simulation_steps = List[SimulationStep]
+        self.from_json()
+
+    # def from_json(self, path: str) -> None:
+    #     with open(path) as f:
+    #         data = json.load(f)
+    #         f.close()
+    #
+    #     self.topography = data['topography']
+    #     targets = data['targets']
+    #     sources = data['sources']
+    #     obstacles = data['obstacles']
+    #     self.pedestrians = data['pedestrians']
+    #     self.n_steps = data['simulation']['end'] - data['simulation']['start']
+    #     self.simulation_steps = data['simulation_steps']
+    #
+    #     for simulation_step in self.simulation_steps:
+    #         print(simulation_step)
+    #         if not self._is_valid_simulation_step(simulation_step, self.pedestrians, self.topography):
+    #             raise InvalidSimulationStepException(simulation_step)
+    #
+    #     #return Simulation(topography, pedestrians, n_steps, simulation_steps)
+
+    def from_json(self) -> None:
+        with open(self.path) as f:
             data = json.load(f)
             f.close()
 
@@ -41,16 +70,16 @@ class Simulation:
 
         for simulation_step in self.simulation_steps:
             print(simulation_step)
-            if not self._is_valid_simulation_step(simulation_step, self.pedestrians, self.topography):
+            if not self._is_valid_simulation_step(simulation_step):
                 raise InvalidSimulationStepException(simulation_step)
 
-        #return Simulation(topography, pedestrians, n_steps, simulation_steps)
+        return data
 
     def _is_valid_simulation_step(self, simulation_step: SimulationStep) -> bool:
-        '''
+        """
         A simulation step is valid if there are coordinates for every defined pedestrian
         and the coordinates lie within the defined topography
-        '''
+        """
         return (
             all([pedestrian.id in simulation_step for pedestrian in self.pedestrians]) and
             all([self._is_valid_position(simulation_step[pedestrian.id])
@@ -73,6 +102,11 @@ class Simulation:
 
 
 class InvalidSimulationStepException(Exception):
+    def __init__(self, simulation_step: SimulationStep):
+        super().__init__("{} is invalid for this Topography.".format(str(simulation_step)))
+
+
+class InvalidPedestrianPositionException(Exception):
     def __init__(self, simulation_step: SimulationStep):
         super().__init__("{} is invalid for this Topography.".format(str(simulation_step)))
 
