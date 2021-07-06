@@ -26,8 +26,8 @@ class Simulation:
         self.n_steps = n_steps
         self.simulation_steps = simulation_steps
         
-    def from_json(self) -> None:
-        with open(self.path) as f:
+    def from_json(self, path: str) -> None:
+        with open(path) as f:
             data = json.load(f)
             f.close()
 
