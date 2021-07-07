@@ -1,4 +1,5 @@
 import unittest
+import os
 from src.topography import (
     Topography, RectangularSource, RectangularTarget, RectangularObstacle)
 from src.simulation import (Simulation, Pedestrian, Position, InvalidSimulationStepException,
@@ -73,3 +74,15 @@ class SimulationJsonTest(unittest.TestCase):
     def test_create_simulation_from_json_invalid(self):
         with self.assertRaises(SimulationReconstructionException):
             Simulation.from_json('tests/invalid_simulation.json')
+
+    def test_write_simulation_to_json(self):
+        simulation = Simulation.from_json('tests/valid_simulation.json')
+        simulation.to_json('tests/simulation.json')
+
+        r_simulation = Simulation.from_json('tests/simulation.json')
+
+        self.assertEqual(simulation.pedestrians, r_simulation.pedestrians)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        os.remove("tests/simulation.json")

@@ -78,6 +78,27 @@ class Simulation:
             })
         return Simulation(topography, pedestrians, data['n_steps'], simulation_steps)
 
+    def to_json(self, path: str) -> None:
+        d = {
+            "topography": self.topography.to_dict(),
+            "pedestrians": [vars(pedestrian) for pedestrian in self.pedestrians],
+            "n_steps": self.n_steps,
+            "simulation_steps": [
+                {
+                    "step": i,
+                    "pedestrian_positions": [
+                        {
+                            "id": key,
+                            "position": [simulation_step[key].x, simulation_step[key].y]
+                        } for key in simulation_step.keys()
+                    ]
+                }
+                for i, simulation_step in enumerate(self.simulation_steps)
+            ]
+        }
+        with open(path, "w+") as f:
+            json.dump(d, f, indent=4)
+
 
 class InvalidSimulationStepException(Exception):
     def __init__(self, simulation_step: SimulationStep):

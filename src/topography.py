@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import List, Tuple, Iterable, Set, Dict
+from typing import List, Tuple, Iterable, Set, Dict, Any
 from abc import ABC, abstractclassmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 
 
@@ -14,6 +14,7 @@ class TopographyObject(ABC):
     id: int
     x: int
     y: int
+    type: TopographyObjectType = field(init=False)
 
     @abstractclassmethod
     def get_min_coordinates(self) -> Tuple[int, int]:
@@ -25,11 +26,19 @@ class TopographyObject(ABC):
         raise NotImplementedError(
             "TopographyObject must implment get_max_coordinates()")
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            key: getattr(self, key) if key != 'type' else self.type.name for key in self.__dict__
+        }
+
 
 @dataclass
 class RectangularTopographyObject(TopographyObject):
     width: int
     height: int
+
+    def __post_init__(self):
+        self.type = TopographyObjectType.RECTANGULAR
 
     def get_min_coordinates(self) -> Tuple[int, int]:
         return (self.x, self.y)
@@ -172,6 +181,15 @@ class Topography:
                 "Object must include 'width' and 'height'")
 
         return Topography(d['width'], d['height']).with_sources(sources).with_targets(targets).with_obstacles(obstacles)
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "width": self.width,
+            "height": self.height,
+            "sources": [source.to_dict() for source in self.sources],
+            "targets": [target.to_dict() for target in self.targets],
+            "obstacles": [obstacle.to_dict() for obstacle in self.obstacles]
+        }
 
 
 class InvalidTopographyObjectException(Exception):
