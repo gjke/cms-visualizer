@@ -1,6 +1,8 @@
 import unittest
-from src.topography import Topography, RectangularSource, RectangularTarget, RectangularObstacle
-from src.simulation import Simulation, Pedestrian, Position, InvalidSimulationStepException, CannotAddSimulationStepException
+from src.topography import (
+    Topography, RectangularSource, RectangularTarget, RectangularObstacle)
+from src.simulation import (Simulation, Pedestrian, Position, InvalidSimulationStepException,
+                            CannotAddSimulationStepException, SimulationReconstructionException)
 
 
 class SimulationTest(unittest.TestCase):
@@ -59,3 +61,15 @@ class SimulationTest(unittest.TestCase):
             self.simulation.add_simulation_step(
                 {11: Position(4, 3), 12: Position(6, 5)}
             )
+
+
+class SimulationJsonTest(unittest.TestCase):
+    def test_create_simulation_from_json(self):
+        simulation = Simulation.from_json('tests/valid_simulation.json')
+        self.assertIsInstance(simulation, Simulation)
+        self.assertEqual(len(simulation.pedestrians), 2)
+        self.assertEqual(simulation.n_steps, 3)
+
+    def test_create_simulation_from_json_invalid(self):
+        with self.assertRaises(SimulationReconstructionException):
+            Simulation.from_json('tests/invalid_simulation.json')

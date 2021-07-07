@@ -1,4 +1,5 @@
 from __future__ import annotations
+import json
 from typing import Optional, List, Text, Dict
 from dataclasses import dataclass
 from .topography import Topography
@@ -24,7 +25,9 @@ class Simulation:
         self.topography = topography
         self.pedestrians = pedestrians
         self.n_steps = n_steps
-        self.simulation_steps = simulation_steps
+        self.simulation_steps = []
+        for simulation_step in simulation_steps:
+            self.add_simulation_step(simulation_step)
 
     def _is_valid_simulation_step(self, simulation_step: SimulationStep) -> bool:
         '''
@@ -51,6 +54,30 @@ class Simulation:
 
         self.simulation_steps.append(simulation_step)
 
+    @classmethod
+    def from_json(cls, path: str) -> Simulation:
+        with open(path) as f:
+            data = json.load(f)
+        topography = Topography.from_dict(data['topography'])
+
+        if 'pedestrians' not in data:
+            raise SimulationReconstructionException(
+                "Object must include 'pedestrians'")
+        pedestrians = [Pedestrian(o["id"], o.get("label", None))
+                       for o in data['pedestrians']]
+        if 'n_steps' not in data:
+            raise SimulationReconstructionException(
+                "Object must include 'n_steps'")
+        if 'simulation_steps' not in data:
+            raise SimulationReconstructionException(
+                "Object must include 'simulation_steps'")
+        simulation_steps: List[SimulationStep] = []
+        for step in data['simulation_steps']:
+            simulation_steps.append({
+                pp["id"]: Position(*pp["position"]) for pp in step["pedestrian_positions"]
+            })
+        return Simulation(topography, pedestrians, data['n_steps'], simulation_steps)
+
 
 class InvalidSimulationStepException(Exception):
     def __init__(self, simulation_step: SimulationStep):
@@ -60,3 +87,8 @@ class InvalidSimulationStepException(Exception):
 class CannotAddSimulationStepException(Exception):
     def __init__(self, simulation_step: SimulationStep):
         super().__init__("Simulation is full. Cannot add {}.".format(str(simulation_step)))
+
+
+class SimulationReconstructionException(Exception):
+    def __init__(self, message: str):
+        super().__init__(message)
