@@ -7,6 +7,7 @@ from .topography import Topography
 @dataclass
 class Pedestrian:
     id: int
+    radius: int
     label: Optional[Text]
 
 

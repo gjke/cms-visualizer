@@ -35,17 +35,17 @@ class Visualizer:
                 width=self.cell_width,
                 height=self.cell_height
             )
-            '''
-            pedestrians_coordinates = [
-                s for s in self.simulation.simulation_steps[step].values()]
+            
+            pedestrians_coordinates = [s for s in self.simulation.simulation_steps[step].values()]
+            pedestrian_radius = [p.radius for p in self.simulation.pedestrians]
             self.canvas.fill_style = 'red'
             self.canvas.fill_rects(
-                x=[round(p.x*unit_width) for p in pedestrians_coordinates],
-                y=[round(p.y*unit_height) for p in pedestrians_coordinates],
-                width=self.cell_width - 1,
-                height=self.cell_height - 1
+                x=[round(p.x*unit_width/self.cell_width)*self.cell_width for p in pedestrians_coordinates],
+                y=[round(p.y*unit_height/self.cell_width)*self.cell_width for p in pedestrians_coordinates],
+                width=[round(radius*unit_width/self.cell_width)*self.cell_width for radius in pedestrian_radius],
+                height=[round(radius*unit_width/self.cell_width)*self.cell_width for radius in pedestrian_radius]
             )
-            '''
+            
             # draw obstacles
             self.canvas.fill_style = 'black'
             self.canvas.fill_rects(
