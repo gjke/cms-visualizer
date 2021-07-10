@@ -15,6 +15,7 @@ class Visualizer:
         #self.canvas = Canvas(width=self.simulation.topography.width *
         #                    cell_width, height=self.simulation.topography.height * cell_height)
         self.canvas = Canvas(width = canvas_width,height = canvas_height)
+        self.show_trajectories = False
 
     def draw(self, step: int):
         '''
@@ -70,8 +71,27 @@ class Visualizer:
                 width=[round(p.width* unit_width/self.cell_width)*self.cell_width for p in self.simulation.topography.sources],
                 height=[round(p.height*unit_height/self.cell_height)*self.cell_height for p in self.simulation.topography.sources]
             )
+            #Draw Trajectories:
+            if self.show_trajectories:
+                keys = [p.id for p in self.simulation.pedestrians]
+                for k in keys:
+                    self.canvas.begin_path()
+                    position = self.simulation.simulation_steps[0][k]
+                    x = round(position.x*unit_width/self.cell_width)*self.cell_width+ self.cell_width*0.5
+                    y = round(position.y*unit_height/self.cell_width)*self.cell_width+ self.cell_height*0.5
+                    self.canvas.move_to(x,y)
+                    for i in range(1,step+1):
+                        position = self.simulation.simulation_steps[step][k]
+                        x = round(position.x*unit_width/self.cell_width)*self.cell_width + self.cell_width*0.5
+                        y = round(position.y*unit_height/self.cell_width)*self.cell_width + self.cell_height*0.5
+                        self.canvas.line_to(x,y)
+                    self.canvas.stroke()
+                
         display(self.canvas)
 
+    def toggle_trajectories(self,toggle_info):
+        self.show_trajectories = not self.show_trajectories
+        
     def build_gui(self):
         play = widgets.Play(
             value=0,
@@ -86,6 +106,15 @@ class Visualizer:
             min=0,
             max=2,
             step=1)
+        trajectories = widgets.ToggleButton(
+            value=False,
+            description='Show Trajectories',
+            disabled=False,
+            button_style='', # 'success', 'info', 'warning', 'danger' or ''
+            tooltip='Toggles the trajectories of the pedestrians',
+            icon='check' # (FontAwesome names without the `fa-` prefix)
+        )
+        trajectories.observe(self.toggle_trajectories)
         widgets.jslink((play, 'value'), (slider, 'value'))
         layout = interactive(self.draw, step=play)
-        return widgets.VBox([slider, layout])
+        return widgets.VBox([slider,trajectories, layout])
