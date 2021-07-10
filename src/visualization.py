@@ -14,8 +14,9 @@ class Visualizer:
         self.cell_height = cell_height
         #self.canvas = Canvas(width=self.simulation.topography.width *
         #                    cell_width, height=self.simulation.topography.height * cell_height)
-        self.canvas = Canvas(width = canvas_width,height = canvas_height)
+        self.canvas = Canvas(width = canvas_width,height = canvas_height,sync_image_data=True)
         self.show_trajectories = False
+        self.current_step = 0
 
     def draw(self, step: int):
         '''
@@ -92,6 +93,13 @@ class Visualizer:
     def toggle_trajectories(self,toggle_info):
         self.show_trajectories = not self.show_trajectories
         
+    def current_canvas_to_png(self, button_info):
+        self.canvas.to_file(str(self.current_step) + '.png')
+        
+    def update_step(self,change):
+        if(change['name'] == 'value'):
+            self.current_step = change['new']
+        
     def build_gui(self):
         play = widgets.Play(
             value=0,
@@ -101,11 +109,15 @@ class Visualizer:
             description="Press play",
             disabled=False
         )
+        
         slider = widgets.IntSlider(
             value=0,
             min=0,
             max=2,
             step=1)
+        
+        slider.observe(self.update_step)
+        
         trajectories = widgets.ToggleButton(
             value=False,
             description='Show Trajectories',
@@ -114,7 +126,17 @@ class Visualizer:
             tooltip='Toggles the trajectories of the pedestrians',
             icon='check' # (FontAwesome names without the `fa-` prefix)
         )
-        trajectories.observe(self.toggle_trajectories)
+        print_as_png = widgets.Button(
+            description='Save as .png',
+            disabled=False,
+            button_style='', # 'success', 'info', 'warning', 'danger' or ''
+            tooltip='Save as -png',
+            icon='check' # (FontAwesome names without the `fa-` prefix)
+        )
+        print_as_png.on_click(self.current_canvas_to_png)
+        
+        trajectories.observe(self.toggle_trajectories, names='value')
+        
         widgets.jslink((play, 'value'), (slider, 'value'))
         layout = interactive(self.draw, step=play)
-        return widgets.VBox([slider,trajectories, layout])
+        return widgets.VBox([slider,trajectories,print_as_png, layout])
