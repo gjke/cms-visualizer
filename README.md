@@ -3,7 +3,7 @@
 
 CMS Visualizer is a Python library for visualizing crowd modelling simulations as a Jupyter Widget.
 
-![Widget](https://github.com/gjke/cms-visualizer/blob/main/example.png?raw=true)
+![Widget](https://github.com/gjke/cvs-visualizer/blob/main/example.png?raw=true)
 
 ## Installation
 
