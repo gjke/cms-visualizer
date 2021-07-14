@@ -110,7 +110,7 @@ class Simulation:
         if 'pedestrians' not in data:
             raise SimulationReconstructionException(
                 "Object must include 'pedestrians'")
-        pedestrians = [Pedestrian(o["id"], o.get("label", None))
+        pedestrians = [Pedestrian(o["id"], o.get("radius", 1), o.get("label", None))
                        for o in data['pedestrians']]
         if 'n_steps' not in data:
             raise SimulationReconstructionException(

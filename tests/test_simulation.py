@@ -17,8 +17,8 @@ class SimulationTest(unittest.TestCase):
             .with_obstacles([RectangularObstacle(3, 50, 50, 1, 1)])
         )
         self.pedestrians = [
-            Pedestrian(11, None),
-            Pedestrian(12, None)
+            Pedestrian(11, 1, None),
+            Pedestrian(12, 1, None)
         ]
         self.simulation = Simulation(self.topography, self.pedestrians, 3, [])
 
