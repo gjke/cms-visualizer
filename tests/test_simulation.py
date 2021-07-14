@@ -1,9 +1,9 @@
 import unittest
 import os
-from src.topography import (
+from src.cms_visualizer.topography import (
     Topography, RectangularSource, RectangularTarget, RectangularObstacle)
-from src.simulation import (Simulation, Pedestrian, Position, InvalidSimulationStepException,
-                            CannotAddSimulationStepException, SimulationReconstructionException)
+from src.cms_visualizer.simulation import (Simulation, Pedestrian, Position, InvalidSimulationStepException,
+                                           CannotAddSimulationStepException, SimulationReconstructionException)
 
 
 class SimulationTest(unittest.TestCase):

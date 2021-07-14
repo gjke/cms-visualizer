@@ -1,4 +1,4 @@
-from src.simulation import Simulation
+from .simulation import Simulation
 from ipycanvas import Canvas, hold_canvas
 import numpy as np
 

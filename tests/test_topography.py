@@ -1,8 +1,8 @@
 import unittest
 import json
-from src.topography import (Topography, RectangularSource, RectangularTarget, RectangularObstacle,
-                            InvalidTopographyObjectException, DuplicateTopographyObjectIdException, TopographyReconstructionException,
-                            UndefinedTopographyObjectType)
+from src.cms_visualizer.topography import (Topography, RectangularSource, RectangularTarget, RectangularObstacle,
+                                           InvalidTopographyObjectException, DuplicateTopographyObjectIdException, TopographyReconstructionException,
+                                           UndefinedTopographyObjectType)
 
 
 class TopographyTest(unittest.TestCase):
