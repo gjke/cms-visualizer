@@ -91,6 +91,12 @@ class Topography:
     object_ids: Set[int]
 
     def __init__(self, width: int, height: int) -> None:
+        """A topography for a crowd simulation
+
+        Args:
+            width (int): width of the area
+            height (int): height of the area
+        """
         self.width = width
         self.height = height
         self.sources = []
@@ -99,6 +105,14 @@ class Topography:
         self.object_ids = set([])
 
     def _is_valid_topography_object(self, obj: TopographyObject) -> bool:
+        """A topography object is valid if it fits into the area entirely
+
+        Args:
+            obj (TopographyObject): A topography object to check
+
+        Returns:
+            bool: True if the topography object is valid
+        """
         min_x, min_y = obj.get_min_coordinates()
         max_x, max_y = obj.get_max_coordinates()
 
@@ -112,6 +126,18 @@ class Topography:
         )
 
     def with_sources(self, new_sources: Iterable[Source]) -> Topography:
+        """Add sources 
+
+        Args:
+            new_sources (Iterable[Source]): Sources to add
+
+        Raises:
+            InvalidTopographyObjectException: Raised if the provided source is an invalid topography object
+            DuplicateTopographyObjectIdException: Raised if such object id already exists
+
+        Returns:
+            Topography: Topography with updated sources
+        """
         for source in new_sources:
             if not self._is_valid_topography_object(source):
                 raise InvalidTopographyObjectException(source)
@@ -123,6 +149,18 @@ class Topography:
         return self
 
     def with_targets(self, new_targets: Iterable[Target]) -> Topography:
+        """Add targets
+
+        Args:
+            new_targets (Iterable[Target]): Targets to add 
+
+        Raises:
+            InvalidTopographyObjectException: Raised if the provided target is an invalid topography object
+            DuplicateTopographyObjectIdException: Raised if such object id already exists
+
+        Returns:
+            Topography: Topography with updated targets
+        """
         for target in new_targets:
             if not self._is_valid_topography_object(target):
                 raise InvalidTopographyObjectException(target)
@@ -134,6 +172,18 @@ class Topography:
         return self
 
     def with_obstacles(self, new_obstacles: Iterable[Obstacle]) -> Topography:
+        """Add obstacles
+
+        Args:
+            new_targets (Iterable[Target]): Obstacles to add 
+
+        Raises:
+            InvalidTopographyObjectException: Raised if the provided obstacle is an invalid topography object
+            DuplicateTopographyObjectIdException: Raised if such object id already exists
+
+        Returns:
+            Topography: Topography with updated obstacles 
+        """
         for obstacle in new_obstacles:
             if not self._is_valid_topography_object(obstacle):
                 raise InvalidTopographyObjectException(obstacle)
@@ -146,6 +196,18 @@ class Topography:
 
     @classmethod
     def from_dict(cls, d: Dict) -> Topography:
+        """Instanciate a topography object from a dictionary
+
+        Args:
+            d (Dict): Dictionary representation of the topography
+
+        Raises:
+            TopographyReconstructionException: Raised if the topography could not be reconstructed 
+            UndefinedTopographyObjectType: Raised if an unknown topography object has been detected
+
+        Returns:
+            Topography: 
+        """
         if 'sources' not in d:
             raise TopographyReconstructionException(
                 "Object must include 'sources'")
@@ -183,6 +245,11 @@ class Topography:
         return Topography(d['width'], d['height']).with_sources(sources).with_targets(targets).with_obstacles(obstacles)
 
     def to_dict(self) -> Dict[str, Any]:
+        """Convert the topography to a dictionary
+
+        Returns:
+            Dict[str, Any]: Dictionary representation of the topography
+        """
         return {
             "width": self.width,
             "height": self.height,
