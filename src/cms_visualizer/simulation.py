@@ -23,6 +23,14 @@ SimulationStep = Dict[int, Position]
 
 class Simulation:
     def __init__(self, topography: Topography, pedestrians: List[Pedestrian], n_steps: int, simulation_steps: List[SimulationStep]) -> None:
+        """Crowd simulation with topography and simulation steps 
+
+        Args:
+            topography (Topography): Topography in which the simulation took place
+            pedestrians (List[Pedestrian]): List of pedestrians participating in the simulation
+            n_steps (int): Number of simulation steps
+            simulation_steps (List[SimulationStep]): List of simulation steps
+        """
         self.topography = topography
         self.pedestrians = pedestrians
         self.n_steps = n_steps
@@ -31,23 +39,50 @@ class Simulation:
             self.add_simulation_step(simulation_step)
 
     def _is_valid_simulation_step(self, simulation_step: SimulationStep) -> bool:
-        '''
-        A simulation step is valid if there are coordinates for every defined pedestrian
-        and the coordinates lie within the defined topography
-        '''
+        """A simulation step is valid if there are positions for every defined pedestrian
+        and these positions are valid
+
+        Args:
+            simulation_step (SimulationStep): Simulation step to check
+
+        Returns:
+            bool: True if the simulation step is valid
+        """
         return (
             all([pedestrian.id in simulation_step for pedestrian in self.pedestrians]) and
             all([self._is_valid_position(simulation_step[pedestrian.id])
                 for pedestrian in self.pedestrians])
         )
 
-    def _is_valid_position(self, position: Position):
+    def _is_valid_position(self, position: Position) -> bool:
+        """A position is valid if it is inside the given topography
+
+        Args:
+            position (Position): Position to check
+
+        Returns:
+            [bool]: True if position is valid
+        """
         return 0 <= position.x < self.topography.width and 0 <= position.y < self.topography.height
 
-    def is_simulation_complete(self):
+    def is_simulation_complete(self) -> bool:
+        """ A simulation is complete if it has n_steps simulation steps
+
+        Returns:
+            [bool]: True if simulation is complete
+        """
         return len(self.simulation_steps) == self.n_steps
 
-    def add_simulation_step(self, simulation_step: SimulationStep):
+    def add_simulation_step(self, simulation_step: SimulationStep) -> None:
+        """Add a simulation step
+
+        Args:
+            simulation_step (SimulationStep): The simulation step to add
+
+        Raises:
+            CannotAddSimulationStepException: Raised if the simulation is already complete
+            InvalidSimulationStepException: Raised if the simulation step is invalid
+        """
         if self.is_simulation_complete():
             raise CannotAddSimulationStepException(simulation_step)
         if not self._is_valid_simulation_step(simulation_step):
@@ -57,6 +92,17 @@ class Simulation:
 
     @classmethod
     def from_json(cls, path: str) -> Simulation:
+        """Instantiate a simulation from a JSON file
+
+        Args:
+            path (str): Path to the JSON file
+
+        Raises:
+            SimulationReconstructionException: Raised if the simulation could not be reconstructed 
+
+        Returns:
+            Simulation: 
+        """
         with open(path) as f:
             data = json.load(f)
         topography = Topography.from_dict(data['topography'])
@@ -64,7 +110,7 @@ class Simulation:
         if 'pedestrians' not in data:
             raise SimulationReconstructionException(
                 "Object must include 'pedestrians'")
-        pedestrians = [Pedestrian(o["id"], o.get("label", None))
+        pedestrians = [Pedestrian(o["id"], o.get("radius", 1), o.get("label", None))
                        for o in data['pedestrians']]
         if 'n_steps' not in data:
             raise SimulationReconstructionException(
@@ -80,6 +126,11 @@ class Simulation:
         return Simulation(topography, pedestrians, data['n_steps'], simulation_steps)
 
     def to_json(self, path: str) -> None:
+        """Serialize the simulation to a JSON file
+
+        Args:
+            path (str): Path to the JSON file
+        """
         d = {
             "topography": self.topography.to_dict(),
             "pedestrians": [vars(pedestrian) for pedestrian in self.pedestrians],
